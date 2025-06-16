@@ -1,0 +1,29 @@
+body {
+    background-color: aquamarine;
+}
+
+h1 {
+    color: #1c8809;
+}
+
+li {
+    font-family: 'Times New Roman', Times, serif;
+}
+
+h2 {
+    text-decoration: underline;
+}
+
+.NBAlistbox {
+    border: 4px solid black;
+}
+
+.NBAvideobox {
+    border: 4px solid rgb(30, 17, 222);
+    text-align: center;
+}
+
+.NBAtableau {
+    border: 4px solid rgb(217, 24, 92);
+    text-align: center;
+}

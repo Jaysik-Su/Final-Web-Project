@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Dog Bridge Game</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #ccf2ff;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 10px;
+        }
+        
+        #game {
+            width: 1000px;
+            height: 300px;
+            margin: 0 auto;
+            border: 3px solid #333;
+            background: linear-gradient(skyblue, white);
+            overflow: hidden;
+            position: relative;
+            display: none;
+        }
+        
+        #background {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://cdn.pixabay.com/photo/2014/04/02/16/18/hills-308231_960_720.png') repeat-x;
+            background-size: cover;
+            z-index: 0;
+        }
+        
+        #cat {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            background: url("https://cdn-icons-png.flaticon.com/512/616/616408.png") center/cover no-repeat;
+            z-index: 2;
+        }
+        
+        .bridge {
+            width: 120px;
+            height: 20px;
+            background: #8b4513;
+            position: absolute;
+            bottom: 0;
+            z-index: 1;
+        }
+        
+        .gap {
+            width: 80px;
+            height: 20px;
+            position: absolute;
+            bottom: 0;
+            z-index: 1;
+        }
+        
+        #message {
+            text-align: center;
+            font-size: 22px;
+            margin-top: 10px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        #startBtn,
+        #restartBtn {
+            display: block;
+            margin: 15px auto;
+            padding: 12px 24px;
+            font-size: 18px;
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        #restartBtn {
+            display: none;
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🐾 Dog Bridge Adventure</h1>
+    <div id="message">Click ▶️ Start Game</div>
+    <button id="startBtn">▶️ Start Game</button>
+    <button id="restartBtn" onclick="location.reload()">🔁 Play Again</button>
+
+    <div id="game">
+        <div id="background"></div>
+        <div id="cat"></div>
+        <!-- Bridge layout -->
+        <div class="bridge" style="left: 0px;"></div>
+        <div class="gap" style="left: 130px;"></div>
+        <div class="bridge" style="left: 210px;"></div>
+        <div class="gap" style="left: 340px;"></div>
+        <div class="bridge" style="left: 420px;"></div>
+        <div class="gap" style="left: 550px;"></div>
+        <div class="bridge" style="left: 630px;"></div>
+        <div class="gap" style="left: 760px;"></div>
+        <div class="bridge" style="left: 840px;"></div>
+    </div>
+
+    <script>
+        const cat = document.getElementById("cat");
+        const game = document.getElementById("game");
+        const message = document.getElementById("message");
+        const startBtn = document.getElementById("startBtn");
+        const restartBtn = document.getElementById("restartBtn");
+
+        let x = 0;
+        let y = 100;
+        let vy = 0;
+        let gravity = -0.5;
+        let jumping = false;
+        let vx = 0;
+        let gameOver = false;
+        let started = false;
+
+        function startGame() {
+            startBtn.style.display = "none";
+            message.textContent = "Use ← → to move, ↑ to jump!";
+            game.style.display = "block";
+            started = true;
+            update();
+        }
+
+        startBtn.addEventListener("click", startGame);
+
+        document.addEventListener("keydown", (e) => {
+            if (!started || gameOver) return;
+
+            if (e.key === "ArrowRight") vx = 3;
+            if (e.key === "ArrowLeft") vx = -3;
+            if (e.key === "ArrowUp" && !jumping) {
+                vy = 10;
+                jumping = true;
+            }
+        });
+
+        document.addEventListener("keyup", (e) => {
+            if (e.key === "ArrowRight" || e.key === "ArrowLeft") vx = 0;
+        });
+
+        function checkCollision() {
+            const bridges = document.querySelectorAll(".bridge");
+            let onBridge = false;
+
+            bridges.forEach(bridge => {
+                const bLeft = bridge.offsetLeft;
+                const bRight = bLeft + bridge.offsetWidth;
+                const bTop = game.offsetHeight - bridge.offsetHeight;
+
+                if (
+                    x + 50 > bLeft &&
+                    x < bRight &&
+                    y <= bridge.offsetHeight + 5
+                ) {
+                    y = bridge.offsetHeight;
+                    vy = 0;
+                    jumping = false;
+                    onBridge = true;
+                }
+            });
+
+            if (!onBridge && y <= 0) {
+                endGame(false);
+            }
+
+            if (x + 50 >= 950 && y <= 20) {
+                endGame(true);
+            }
+        }
+
+        function endGame(win) {
+            gameOver = true;
+            message.textContent = win ?
+                "🎉 You win! The dog crossed all the bridges!" :
+                "💀 Oh no! The dog fell!";
+            restartBtn.style.display = "block";
+        }
+
+        function update() {
+            if (gameOver) return;
+
+            vy += gravity;
+            y += vy;
+            if (y < 0) y = 0;
+
+            x += vx;
+            if (x < 0) x = 0;
+            if (x > 950) x = 950;
+
+            cat.style.left = x + "px";
+            cat.style.bottom = y + "px";
+
+            checkCollision();
+            requestAnimationFrame(update);
+        }
+    </script>
+</body>
+
+</html>
